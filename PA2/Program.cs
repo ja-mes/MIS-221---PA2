@@ -34,7 +34,6 @@ namespace PA2
 
         public int Generate()
         {
-            Utils.P("foo");
             Utils.Divider('-', 50);
             for(int i = 0; i < menuItems.Length; i++)
             {
@@ -65,16 +64,39 @@ namespace PA2
 
     class Program
     {
-
         static void Main(string[] args)
         {
+            // add any additional menu items to this array
             string[] menuItems = {
                 "Convert currencies",
                 "Restaurant POS",
                 "Exit"
              };
 
+            int userOption;
+
             Menu optionsMenu = new Menu(menuItems);
+
+            userOption = optionsMenu.Generate();
+
+            switch (userOption) {
+                case 1:
+                    // Convert Currencies
+                    break;
+                case 2:
+                    // Restuarant POS
+                    break;
+                case 3:
+                    Exit();
+                    break;
+            }
+
+            Console.ReadKey();
+        }
+
+        static void Exit()
+        {
+            System.Environment.Exit(0);
         }
     }
 }
