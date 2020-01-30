@@ -20,8 +20,21 @@ namespace PA2
 
             P(outputStr);
         }
+
+        public static void Header(string title)
+        {
+            Console.Clear();
+            Divider('-', 50);
+            P($"\n{title}\n");
+            Divider('-', 50);
+        }
+        public static void Exit()
+        {
+            System.Environment.Exit(0);
+        }
+
     }
-    
+
     class Menu
     {
         private bool error;
@@ -34,13 +47,14 @@ namespace PA2
 
         public int Generate()
         {
-            Utils.Divider('-', 50);
-            for(int i = 0; i < menuItems.Length; i++)
+            Utils.P();
+
+            for (int i = 0; i < menuItems.Length; i++)
             {
                 string output = $"({Convert.ToString(i + 1)}) {menuItems[i]}";
                 Utils.P(output);
             }
-            Utils.Divider('-', 50);
+            Utils.Divider('_', 50);
 
             if (error)
             {
@@ -55,10 +69,30 @@ namespace PA2
             if (!valid || selection < 1 || selection > menuItems.Length)
             {
                 error = true;
-                Generate();
+                return Generate();
             }
 
             return selection;
+        }
+    }
+
+    class ResturantPOS
+    {
+        Menu menu;
+        string[] menuOptions =
+        {
+            "Calculate Bill",
+            "Back",
+        };
+
+        public ResturantPOS()
+        {
+            menu = new Menu(menuOptions);
+        }
+        public void Display()
+        {
+            Utils.Header("Resturant POS");
+            menu.Generate();
         }
     }
 
@@ -73,30 +107,24 @@ namespace PA2
                 "Exit"
              };
 
-            int userOption;
+            Utils.Header("Hospitality Management Software");
 
             Menu optionsMenu = new Menu(menuItems);
 
-            userOption = optionsMenu.Generate();
-
-            switch (userOption) {
+            switch (optionsMenu.Generate())
+            {
                 case 1:
-                    // Convert Currencies
                     break;
                 case 2:
-                    // Restuarant POS
+                    ResturantPOS pos = new ResturantPOS();
+                    pos.Display();
                     break;
                 case 3:
-                    Exit();
+                    Utils.Exit();
                     break;
             }
 
             Console.ReadKey();
-        }
-
-        static void Exit()
-        {
-            System.Environment.Exit(0);
         }
     }
 }
