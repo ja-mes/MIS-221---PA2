@@ -84,6 +84,46 @@ namespace PA2
         }
     }
 
+    class ConvertCurriences
+    {
+        Menu menu;
+
+        string[] menuOptions =
+        {
+            ""
+        };
+
+        void Header()
+        {
+            Utils.Header("Convert currencies");
+        }
+        public void Render()
+        {
+            Header();
+            GetFromCurrencyType();
+        }
+
+        void GetFromCurrencyType()
+        {
+            string[] fromCurrencyOptions =
+            {
+                "(C)anadian Dollar",
+                "(E)Uro",
+                "(I)ndian Rupee",
+                "(J)apense Yen",
+                "(M)exican Peso",
+                "(B)ritish Pound",
+            };
+            Menu fromCurrency = new Menu(fromCurrencyOptions);
+
+            switch(fromCurrency.GetInput())
+            {
+
+            } 
+            
+        }
+    }
+
     class ResturantPOS
     {
         Menu menu;
@@ -184,6 +224,7 @@ namespace PA2
         {
             DisplayBill();
 
+            // need to reset these in case the user wants to calculate another bill
             foodTotal = 0;
             alcoholTotal = 0;
             gratuityTotal = 0;
@@ -229,6 +270,7 @@ namespace PA2
             switch (menu.GetInput())
             {
                 case 1:
+                    new ConvertCurriences().Render();
                     break;
                 case 2:
                     new ResturantPOS().Render();
