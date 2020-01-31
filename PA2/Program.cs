@@ -46,20 +46,31 @@ namespace PA2
     class Menu
     {
         private bool error;
+        private bool firstL;
         private string[] menuItems;
 
-        public Menu(string[] items)
+        public Menu(string[] items, bool firstLSelection = false)
         {
+            firstL = firstLSelection;
             menuItems = items;
         }
 
         public int GetInput()
         {
-            Utils.P();
+            Utils.P(); // make sure the menu has a blank line about it
 
             for (int i = 0; i < menuItems.Length; i++)
             {
-                string output = $"({Convert.ToString(i + 1)}) {menuItems[i]}";
+                string output;
+                if(firstL)
+                {
+                    char firstC = Char.ToUpper(menuItems[i][0]);
+                    output = $"({firstC}){menuItems[i].Substring(1, menuItems[i].Length - 1)}";
+                }
+                else
+                {
+                    output = $"({Convert.ToString(i + 1)}) {menuItems[i]}";
+                }
                 Utils.P(output);
             }
             Utils.Divider('_', 50);
@@ -86,13 +97,6 @@ namespace PA2
 
     class ConvertCurriences
     {
-        Menu menu;
-
-        string[] menuOptions =
-        {
-            ""
-        };
-
         void Header()
         {
             Utils.Header("Convert currencies");
@@ -107,14 +111,14 @@ namespace PA2
         {
             string[] fromCurrencyOptions =
             {
-                "(C)anadian Dollar",
-                "(E)Uro",
-                "(I)ndian Rupee",
-                "(J)apense Yen",
-                "(M)exican Peso",
-                "(B)ritish Pound",
+                "Canadian Dollar",
+                "EUro",
+                "Indian Rupee",
+                "Japense Yen",
+                "Mexican Peso",
+                "British Pound",
             };
-            Menu fromCurrency = new Menu(fromCurrencyOptions);
+            Menu fromCurrency = new Menu(fromCurrencyOptions, true);
 
             switch(fromCurrency.GetInput())
             {
