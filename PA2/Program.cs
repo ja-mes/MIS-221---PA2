@@ -53,7 +53,7 @@ namespace PA2
             menuItems = items;
         }
 
-        public int Render()
+        public int GetInput()
         {
             Utils.P();
 
@@ -77,7 +77,7 @@ namespace PA2
             if (!valid || selection < 1 || selection > menuItems.Length)
             {
                 error = true;
-                return Render();
+                return GetInput();
             }
 
             return selection;
@@ -102,10 +102,10 @@ namespace PA2
         {
             Utils.Header("Resturant POS");
             menu = new Menu(menuOptions);
-            switch (menu.Render())
+            switch (menu.GetInput())
             {
                 case 1:
-                    Init();
+                    CalculateBill();
                     break;
                 case 2:
                     MainScreen.Render();
@@ -113,29 +113,29 @@ namespace PA2
             }
         }
 
-        void Init()
+        void CalculateBill()
         {
             GetFood();
             GetAlcohol();
-            Header();
+            Finish();
         }
 
-        void Header()
+        void DisplayBill()
         {
             Utils.Header("resturant pos", "Calculate Bill");
 
             Utils.P();
-            Utils.P($"Food:\t\t${Convert.ToString(foodTotal)}");
-            Utils.P($"Alcohol:\t${Convert.ToString(alcoholTotal)}");
-            Utils.P($"Gratuity:\t${Convert.ToString(gratuityTotal)}");
-            Utils.P($"Total Due:\t${Convert.ToString(totalDue)}");
+            Utils.P($"Food:\t\t${foodTotal.ToString("F")}");
+            Utils.P($"Alcohol:\t${alcoholTotal.ToString("F")}");
+            Utils.P($"Gratuity:\t${gratuityTotal.ToString("F")}");
+            Utils.P($"Total Due:\t${totalDue.ToString("F")}");
             Utils.P("\n\n");
 
         }
 
         void GetFood(bool error = false)
         {
-            Header();
+            DisplayBill();
 
             if(error)
             {
@@ -145,7 +145,7 @@ namespace PA2
             Utils.P("Enter the food total: $", false);
 
             if(double.TryParse(Console.ReadLine(), out foodTotal)) {
-                Calculate();
+                ComputeTotal();
             }
             else
             {
@@ -155,7 +155,7 @@ namespace PA2
         }
         void GetAlcohol(bool error = false)
         {
-            Header();
+            DisplayBill();
 	
             if(error)
             {
@@ -165,20 +165,47 @@ namespace PA2
             Utils.P("Enter the alchohol total: $", false);
 
             if(double.TryParse(Console.ReadLine(), out alcoholTotal)) {
-                Calculate();
+                ComputeTotal();
             }
             else
             {
                 GetAlcohol(true);
-
             }
         }
 
-        void Calculate()
+        void ComputeTotal()
         {
             gratuityTotal = Math.Round(foodTotal * 0.18);
             totalDue = Math.Round(gratuityTotal + foodTotal + alcoholTotal, 2);
             totalDue = Math.Round(totalDue * 1.09, 2);
+        }
+
+        void Finish()
+        {
+            DisplayBill();
+
+            foodTotal = 0;
+            alcoholTotal = 0;
+            gratuityTotal = 0;
+            totalDue = 0;
+
+            string[] finishItems =
+            {
+                "Calculate Another Bill",
+                "Back"
+            };
+            Menu finishMenu = new Menu(finishItems);
+
+            switch(finishMenu.GetInput())
+            {
+                case 1:
+                    CalculateBill();
+                    break;
+                case 2:
+                    Render();
+                    break;
+            }
+
         }
 
     }
@@ -199,7 +226,7 @@ namespace PA2
 
             menu = new Menu(menuItems);
 
-            switch (menu.Render())
+            switch (menu.GetInput())
             {
                 case 1:
                     break;
