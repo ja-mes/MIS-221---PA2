@@ -21,15 +21,23 @@ namespace PA2
             P(outputStr);
         }
 
-        public static void Header(string title)
+        public static void Header(string title, string subHeader=null)
         {
             Console.Clear();
             Divider('-', 50);
-            P($"\n{title}\n");
+            P($"\n{title.ToUpper()}", false);
+
+            if (subHeader != null)
+                P($" / {subHeader}");
+            else
+                P();
+
+            P();
             Divider('-', 50);
         }
         public static void Exit()
         {
+            P("\n\nThank you for using Hospitality Management Software!\n");
             System.Environment.Exit(0);
         }
 
@@ -45,7 +53,7 @@ namespace PA2
             menuItems = items;
         }
 
-        public int Generate()
+        public int Render()
         {
             Utils.P();
 
@@ -69,7 +77,7 @@ namespace PA2
             if (!valid || selection < 1 || selection > menuItems.Length)
             {
                 error = true;
-                return Generate();
+                return Render();
             }
 
             return selection;
@@ -85,14 +93,124 @@ namespace PA2
             "Back",
         };
 
-        public ResturantPOS()
-        {
-            menu = new Menu(menuOptions);
-        }
-        public void Display()
+        double foodTotal = 0;
+        double alcoholTotal = 0;
+        double gratuityTotal = 0;
+        double totalDue = 0;
+
+        public void Render()
         {
             Utils.Header("Resturant POS");
-            menu.Generate();
+            menu = new Menu(menuOptions);
+            switch (menu.Render())
+            {
+                case 1:
+                    Init();
+                    break;
+                case 2:
+                    MainScreen.Render();
+                    break;
+            }
+        }
+
+        void Init()
+        {
+            GetFood();
+            GetAlcohol();
+            Header();
+        }
+
+        void Header()
+        {
+            Utils.Header("resturant pos", "Calculate Bill");
+
+            Utils.P();
+            Utils.P($"Food:\t\t${Convert.ToString(foodTotal)}");
+            Utils.P($"Alcohol:\t${Convert.ToString(alcoholTotal)}");
+            Utils.P($"Gratuity:\t${Convert.ToString(gratuityTotal)}");
+            Utils.P($"Total Due:\t${Convert.ToString(totalDue)}");
+            Utils.P("\n\n");
+
+        }
+
+        void GetFood(bool error = false)
+        {
+            Header();
+
+            if(error)
+            {
+                Utils.P("Invalid entry");
+            }
+
+            Utils.P("Enter the food total: $", false);
+
+            if(double.TryParse(Console.ReadLine(), out foodTotal)) {
+                Calculate();
+            }
+            else
+            {
+                GetFood(true);
+            }
+
+        }
+        void GetAlcohol(bool error = false)
+        {
+            Header();
+	
+            if(error)
+            {
+                Utils.P("Invalid entry");
+            }
+
+            Utils.P("Enter the alchohol total: $", false);
+
+            if(double.TryParse(Console.ReadLine(), out alcoholTotal)) {
+                Calculate();
+            }
+            else
+            {
+                GetAlcohol(true);
+
+            }
+        }
+
+        void Calculate()
+        {
+            gratuityTotal = Math.Round(foodTotal * 0.18);
+            totalDue = Math.Round(gratuityTotal + foodTotal + alcoholTotal, 2);
+            totalDue = Math.Round(totalDue * 1.09, 2);
+        }
+
+    }
+
+    static class MainScreen
+    {
+        static Menu menu;
+
+        static string[] menuItems = {
+            "Convert currencies",
+            "Restaurant POS",
+            "Exit"
+        };
+
+        public static void Render()
+        {
+            Utils.Header("Hospitality Management Software");
+
+            menu = new Menu(menuItems);
+
+            switch (menu.Render())
+            {
+                case 1:
+                    break;
+                case 2:
+                    new ResturantPOS().Render();
+                    break;
+                case 3:
+                    Utils.Exit();
+                    break;
+            }
+
         }
     }
 
@@ -100,30 +218,7 @@ namespace PA2
     {
         static void Main(string[] args)
         {
-            // add any additional menu items to this array
-            string[] menuItems = {
-                "Convert currencies",
-                "Restaurant POS",
-                "Exit"
-             };
-
-            Utils.Header("Hospitality Management Software");
-
-            Menu optionsMenu = new Menu(menuItems);
-
-            switch (optionsMenu.Generate())
-            {
-                case 1:
-                    break;
-                case 2:
-                    ResturantPOS pos = new ResturantPOS();
-                    pos.Display();
-                    break;
-                case 3:
-                    Utils.Exit();
-                    break;
-            }
-
+            MainScreen.Render();
             Console.ReadKey();
         }
     }
