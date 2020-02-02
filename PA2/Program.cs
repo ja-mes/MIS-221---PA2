@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace PA2
 {
@@ -86,15 +87,74 @@ namespace PA2
         }
     }
 
+    static class ExchangeRates
+    {
+        public static Dictionary<string, double> US = new Dictionary<string, double>()
+        {
+            { "US Dollar", 1 },
+            { "Canadian Dollar", 1.323400},
+            { "Euro", 0.902254},
+            { "Indian Rupee", 71.534161},
+            { "Japense Yen", 108.466743},
+            { "Mexican Peso", 18.858311},
+            { "British Pound", 0.757946},
+        };
+
+        public static Dictionary<string, double> Canadian = new Dictionary<string, double>()
+        {
+            { "Canadian Dollar", 1 },
+            { "US Dollar", 0.755467},
+            { "Euro", 0.681584},
+            { "Indian Rupee", 54.040256},
+            { "Japense Yen", 81.915460},
+            { "Mexican Peso", 14.247736},
+            { "British Pound", 0.573290},
+        };
+
+        public static Dictionary<string, double> Euro = new Dictionary<string, double>()
+        {
+            { "Euro", 1 },
+            { "Canadian Dollar", 1.467085},
+            { "US Dollar", 1.108352},
+            { "Indian Rupee", 79.282554},
+            { "Japense Yen", 120.200349},
+            { "Mexican Peso", 20.895462},
+            { "British Pound", 0.841332},
+        };
+
+        public static Dictionary<string, double> Indian = new Dictionary<string, double>()
+        {
+            { "US Dollar", 0.013980 },
+            { "Canadian Dollar", 0.018504},
+            { "Euro", 0.012614},
+            { "Indian Rupee", 1},
+            { "Japense Yen", 1.516199},
+            { "Mexican Peso", 0.263740},
+            { "British Pound", 0.010606},
+        };
+
+    }
+
     class ConvertCurriences
     {
-        double fromCurrencyAmount;
+        readonly string[] currencyOptions =
+        {
+            "US Dollar",
+            "Canadian Dollar",
+            "Euro",
+            "Indian Rupee",
+            "Japense Yen",
+            "Mexican Peso",
+            "British Pound",
+        };
 
+        // use to calculate the exchance
+        double result;
+        double fromCurrencyAmount;
         string fromCurrencyType;
         string toCurrencyType;
 
-
-        void Header()
+        void Intialize()
         {
             Utils.Header("Convert currencies");
             Utils.P("\n");
@@ -108,22 +168,12 @@ namespace PA2
         }
         public void Render()
         {
-            Header();
-            GetFromCurrencyType();
+            Intialize();
+            GetCurrencyType();
         }
 
-        void GetFromCurrencyType()
+        void GetCurrencyType()
         {
-            string[] currencyOptions =
-            {
-                "US Dollar",
-                "Canadian Dollar",
-                "Euro",
-                "Indian Rupee",
-                "Japense Yen",
-                "Mexican Peso",
-                "British Pound",
-            };
             Menu currencyMenu = new Menu(currencyOptions);
 
             int selection;
@@ -131,19 +181,19 @@ namespace PA2
             Utils.P("Convert from:");
             selection = currencyMenu.GetInput();
             fromCurrencyType = currencyOptions[selection - 1];
-            Header(); // Rerender screen  
+            Intialize(); // Rerender screen  
 
             Utils.P($"Convert from {fromCurrencyType} to:");
             selection = currencyMenu.GetInput();
             toCurrencyType = currencyOptions[selection - 1];
 
 
-            GrabCurrency();
+            GetValue();
         }
 
-        void GrabCurrency(bool error = false)
+        void GetValue(bool error = false)
         {
-            Header(); // Rerender
+            Intialize(); // Rerender
 
             if (error)
             {
@@ -153,17 +203,61 @@ namespace PA2
             Utils.P($"Enter amount in {fromCurrencyType}: ", false);
 
             if (double.TryParse(Console.ReadLine(), out fromCurrencyAmount)) {
-                ConvertCurrency(); // we now have both values. time to run the conversion 
+                ConvertCurrency(); // we now have a value. time to run the conversion
             }
             else
             {
-                GrabCurrency(true);
+                GetValue(true);
             }
         }
 
         void ConvertCurrency()
         {
-            Utils.P(fromCurrencyAmount.ToString());
+            Intialize(); // Rerender
+            double rate = 1;
+
+            switch(fromCurrencyType)
+            {
+                case "US Dollar":
+                    rate = ExchangeRates.US[toCurrencyType];
+                    break;
+                case "Canadian Dollar":
+                    rate = ExchangeRates.Canadian[toCurrencyType];
+                    break;
+                case "Euro":
+                    rate = ExchangeRates.Euro[toCurrencyType];
+                    break;
+            }
+
+            double result = rate * fromCurrencyAmount;
+
+
+            Utils.P($"{fromCurrencyAmount} {fromCurrencyType} = {result} {toCurrencyType}");
+
+            string[] restartMenuOptions =
+            {
+                $"Convert {fromCurrencyType} to {toCurrencyType} again",
+                "Select Another Conversion",
+                "Back",
+            };
+
+            Utils.P("\n");
+            Menu restartMenu = new Menu(restartMenuOptions);
+
+            switch(restartMenu.GetInput())
+            {
+                case 1:
+                    GetValue();
+                    break;
+                case 2:
+                    new ConvertCurriences().Render();
+                    break;
+                case 3:
+                    MainScreen.Render();
+                    break;
+            }
+
+
         }
 
     }
@@ -199,12 +293,18 @@ namespace PA2
 
         void CalculateBill()
         {
+            // make sure everything is zero before we start running calculations
+            foodTotal = 0;
+            alcoholTotal = 0;
+            gratuityTotal = 0;
+            totalDue = 0;
+
             GetFood();
             GetAlcohol();
             Finish();
         }
 
-        void DisplayBill()
+        void Initialize()
         {
             Utils.Header("resturant pos", "Calculate Bill");
 
@@ -219,7 +319,7 @@ namespace PA2
 
         void GetFood(bool error = false)
         {
-            DisplayBill();
+            Initialize();
 
             if (error)
             {
@@ -240,7 +340,7 @@ namespace PA2
         }
         void GetAlcohol(bool error = false)
         {
-            DisplayBill();
+            Initialize();
 
             if (error)
             {
@@ -268,13 +368,7 @@ namespace PA2
 
         void Finish()
         {
-            DisplayBill();
-
-            // need to reset these in case the user wants to calculate another bill
-            foodTotal = 0;
-            alcoholTotal = 0;
-            gratuityTotal = 0;
-            totalDue = 0;
+            Initialize();
 
             string[] finishItems =
             {
