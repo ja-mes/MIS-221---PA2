@@ -46,12 +46,10 @@ namespace PA2
     class Menu
     {
         private bool error;
-        private bool firstL;
         private string[] menuItems;
 
-        public Menu(string[] items, bool firstLSelection = false)
+        public Menu(string[] items)
         {
-            firstL = firstLSelection;
             menuItems = items;
         }
 
@@ -62,15 +60,8 @@ namespace PA2
             for (int i = 0; i < menuItems.Length; i++)
             {
                 string output;
-                if(firstL)
-                {
-                    char firstC = Char.ToUpper(menuItems[i][0]);
-                    output = $"({firstC}){menuItems[i].Substring(1, menuItems[i].Length - 1)}";
-                }
-                else
-                {
-                    output = $"({Convert.ToString(i + 1)}) {menuItems[i]}";
-                }
+                output = $"({Convert.ToString(i + 1)}) {menuItems[i]}";
+
                 Utils.P(output);
             }
             Utils.Divider('_', 50);
@@ -97,9 +88,24 @@ namespace PA2
 
     class ConvertCurriences
     {
+        double fromCurrencyAmount;
+        double toCurrencyAmount;
+
+        string fromCurrencyType;
+        string toCurrencyType;
+
+
         void Header()
         {
             Utils.Header("Convert currencies");
+            Utils.P("\n");
+
+            if(fromCurrencyType != null && toCurrencyType != null)
+            {
+                Utils.P($"From {fromCurrencyType} to {toCurrencyType}");
+
+                Utils.P("\n");
+            }
         }
         public void Render()
         {
@@ -109,23 +115,71 @@ namespace PA2
 
         void GetFromCurrencyType()
         {
-            string[] fromCurrencyOptions =
+            string[] currencyOptions =
             {
+                "US Dollar",
                 "Canadian Dollar",
-                "EUro",
+                "Euro",
                 "Indian Rupee",
                 "Japense Yen",
                 "Mexican Peso",
                 "British Pound",
             };
-            Menu fromCurrency = new Menu(fromCurrencyOptions, true);
+            Menu currencyMenu = new Menu(currencyOptions);
 
-            switch(fromCurrency.GetInput())
-            {
+            int selection;
 
-            } 
-            
+            Utils.P("Convert from:");
+            selection = currencyMenu.GetInput();
+            fromCurrencyType = currencyOptions[selection - 1];
+            Header(); // Rerender screen  
+
+            Utils.P($"Convert from {fromCurrencyType} to:");
+            selection = currencyMenu.GetInput();
+            toCurrencyType = currencyOptions[selection - 1];
+
+
+            GrabCurrency();
         }
+
+        void GrabCurrency(bool fromCurrency = true, bool error = false)
+        {
+            Header(); // Rerender
+
+            if (error)
+            {
+                Console.WriteLine("Invalid entry.");
+            }
+
+            string displayVal = fromCurrency ? fromCurrencyType : toCurrencyType;
+            Utils.P($"Enter amount in {displayVal}: ", false);
+
+            double value;
+            if (double.TryParse(Console.ReadLine(), out value)) {
+                if(fromCurrency)
+                {
+                    fromCurrencyAmount = value;
+                    GrabCurrency(false); // re-run the function to get to value 
+                }
+                else
+                {
+                    toCurrencyAmount = value;
+                    ConvertCurrency(); // we now have both values. time to run the conversion 
+                }
+
+            }
+            else
+            {
+                GrabCurrency(fromCurrency, true);
+            }
+        }
+
+        void ConvertCurrency()
+        {
+            Utils.P(fromCurrencyAmount.ToString());
+            Utils.P(toCurrencyAmount.ToString());
+        }
+
     }
 
     class ResturantPOS
@@ -181,14 +235,15 @@ namespace PA2
         {
             DisplayBill();
 
-            if(error)
+            if (error)
             {
                 Utils.P("Invalid entry");
             }
 
             Utils.P("Enter the food total: $", false);
 
-            if(double.TryParse(Console.ReadLine(), out foodTotal)) {
+            if (double.TryParse(Console.ReadLine(), out foodTotal))
+            {
                 ComputeTotal();
             }
             else
@@ -200,15 +255,16 @@ namespace PA2
         void GetAlcohol(bool error = false)
         {
             DisplayBill();
-	
-            if(error)
+
+            if (error)
             {
                 Utils.P("Invalid entry");
             }
 
             Utils.P("Enter the alchohol total: $", false);
 
-            if(double.TryParse(Console.ReadLine(), out alcoholTotal)) {
+            if (double.TryParse(Console.ReadLine(), out alcoholTotal))
+            {
                 ComputeTotal();
             }
             else
@@ -241,7 +297,7 @@ namespace PA2
             };
             Menu finishMenu = new Menu(finishItems);
 
-            switch(finishMenu.GetInput())
+            switch (finishMenu.GetInput())
             {
                 case 1:
                     CalculateBill();
