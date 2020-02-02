@@ -89,7 +89,6 @@ namespace PA2
     class ConvertCurriences
     {
         double fromCurrencyAmount;
-        double toCurrencyAmount;
 
         string fromCurrencyType;
         string toCurrencyType;
@@ -142,7 +141,7 @@ namespace PA2
             GrabCurrency();
         }
 
-        void GrabCurrency(bool fromCurrency = true, bool error = false)
+        void GrabCurrency(bool error = false)
         {
             Header(); // Rerender
 
@@ -151,33 +150,20 @@ namespace PA2
                 Console.WriteLine("Invalid entry.");
             }
 
-            string displayVal = fromCurrency ? fromCurrencyType : toCurrencyType;
-            Utils.P($"Enter amount in {displayVal}: ", false);
+            Utils.P($"Enter amount in {fromCurrencyType}: ", false);
 
-            double value;
-            if (double.TryParse(Console.ReadLine(), out value)) {
-                if(fromCurrency)
-                {
-                    fromCurrencyAmount = value;
-                    GrabCurrency(false); // re-run the function to get to value 
-                }
-                else
-                {
-                    toCurrencyAmount = value;
-                    ConvertCurrency(); // we now have both values. time to run the conversion 
-                }
-
+            if (double.TryParse(Console.ReadLine(), out fromCurrencyAmount)) {
+                ConvertCurrency(); // we now have both values. time to run the conversion 
             }
             else
             {
-                GrabCurrency(fromCurrency, true);
+                GrabCurrency(true);
             }
         }
 
         void ConvertCurrency()
         {
             Utils.P(fromCurrencyAmount.ToString());
-            Utils.P(toCurrencyAmount.ToString());
         }
 
     }
