@@ -133,6 +133,16 @@ namespace PA2
             { "British Pound", 0.010606},
         };
 
+        public static Dictionary<string, double> Japense = new Dictionary<string, double>()
+        {
+            { "US Dollar", 0.009219},
+            { "Canadian Dollar", 0.012204},
+            { "Euro", 0.008314},
+            { "Indian Rupee", 0.659389},
+            { "Japense Yen", 1 },
+            { "Mexican Peso", 0.173930},
+            { "British Pound", 0.006993},
+        };
     }
 
     class ConvertCurriences
@@ -226,6 +236,9 @@ namespace PA2
                     break;
                 case "Euro":
                     rate = ExchangeRates.Euro[toCurrencyType];
+                    break;
+                case "Indian Rupee":
+                    rate = ExchangeRates.Indian[toCurrencyType];    
                     break;
             }
 
