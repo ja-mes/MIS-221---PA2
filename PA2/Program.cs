@@ -87,6 +87,9 @@ namespace PA2
         }
     }
 
+    /*
+     * Exchange rates uses a collection of dictionaries to store the exchange rates of the supported currencies
+     */
     static class ExchangeRates
     {
         public static Dictionary<string, double> US = new Dictionary<string, double>()
@@ -206,18 +209,29 @@ namespace PA2
 
         void GetCurrencyType()
         {
-            Menu currencyMenu = new Menu(currencyOptions);
+            Menu fromMenu = new Menu(currencyOptions);
 
             int selection;
 
+            // get from currency
             Utils.P("Convert from:");
-            selection = currencyMenu.GetInput();
+            selection = fromMenu.GetInput();
             fromCurrencyType = currencyOptions[selection - 1];
             Intialize(); // Rerender screen  
 
+
+            // get to currency type
+
+            // we don't want the from currency showing up in the options. remove it
+            var list = new List<string>(currencyOptions);
+            list.Remove(fromCurrencyType);
+            string[] toCurrencyOptions = list.ToArray();
+
+            Menu toMenu = new Menu(toCurrencyOptions);
+            
             Utils.P($"Convert from {fromCurrencyType} to:");
-            selection = currencyMenu.GetInput();
-            toCurrencyType = currencyOptions[selection - 1];
+            selection = toMenu.GetInput();
+            toCurrencyType = toCurrencyOptions[selection - 1];
 
 
             GetValue();
@@ -276,7 +290,7 @@ namespace PA2
 
             double result = rate * fromCurrencyAmount;
 
-            // output conversion to consle
+            // output conversion to console
             Utils.P($"{fromCurrencyAmount} {fromCurrencyType} = {result.ToString("F")} {toCurrencyType}");
 
             string[] restartMenuOptions =
@@ -310,7 +324,8 @@ namespace PA2
     class ResturantPOS
     {
         Menu menu;
-        string[] menuOptions =
+
+        readonly string[] menuOptions =
         {
             "Calculate Bill",
             "Back",
@@ -356,6 +371,7 @@ namespace PA2
         {
             Utils.Header("resturant pos", "Calculate Bill");
 
+            // output the calculations. round with to string
             Utils.P();
             Utils.P($"Food:\t\t${foodTotal.ToString("F")}");
             Utils.P($"Alcohol:\t${alcoholTotal.ToString("F")}");
