@@ -143,8 +143,31 @@ namespace PA2
             { "Mexican Peso", 0.173930},
             { "British Pound", 0.006993},
         };
+
+        public static Dictionary<string, double> Mexican = new Dictionary<string, double>()
+        {
+            { "US Dollar", 0.053169	},
+            { "Canadian Dollar", 0.070683},
+            { "Euro", 0.048059},
+            { "Indian Rupee", 3.791722},
+            { "Japense Yen", 5.778462},
+            { "Mexican Peso", 1},
+            { "British Pound", 0.040907},
+        };
+
+        public static Dictionary<string, double> British = new Dictionary<string, double>()
+        {
+            { "US Dollar", 1.299683 },
+            { "Canadian Dollar", 1.727779},
+            { "Euro", 1.174894},
+            { "Indian Rupee", 92.677850	},
+            { "Japense Yen", 141.260915},
+            { "Mexican Peso", 24.438507},
+            { "British Pound", 1},
+        };
     }
 
+    // TODO: remove selected currency from the to menu
     class ConvertCurriences
     {
         readonly string[] currencyOptions =
@@ -159,7 +182,6 @@ namespace PA2
         };
 
         // use to calculate the exchance
-        double result;
         double fromCurrencyAmount;
         string fromCurrencyType;
         string toCurrencyType;
@@ -169,7 +191,7 @@ namespace PA2
             Utils.Header("Convert currencies");
             Utils.P("\n");
 
-            if(fromCurrencyType != null && toCurrencyType != null)
+            if (fromCurrencyType != null && toCurrencyType != null)
             {
                 Utils.P($"From {fromCurrencyType} to {toCurrencyType}");
 
@@ -212,7 +234,8 @@ namespace PA2
 
             Utils.P($"Enter amount in {fromCurrencyType}: ", false);
 
-            if (double.TryParse(Console.ReadLine(), out fromCurrencyAmount)) {
+            if (double.TryParse(Console.ReadLine(), out fromCurrencyAmount))
+            {
                 ConvertCurrency(); // we now have a value. time to run the conversion
             }
             else
@@ -226,7 +249,7 @@ namespace PA2
             Intialize(); // Rerender
             double rate = 1;
 
-            switch(fromCurrencyType)
+            switch (fromCurrencyType)
             {
                 case "US Dollar":
                     rate = ExchangeRates.US[toCurrencyType];
@@ -238,14 +261,23 @@ namespace PA2
                     rate = ExchangeRates.Euro[toCurrencyType];
                     break;
                 case "Indian Rupee":
-                    rate = ExchangeRates.Indian[toCurrencyType];    
+                    rate = ExchangeRates.Indian[toCurrencyType];
+                    break;
+                case "Japense Yen":
+                    rate = ExchangeRates.Japense[toCurrencyType];
+                    break;
+                case "Mexican Peso":
+                    rate = ExchangeRates.Mexican[toCurrencyType];
+                    break;
+                case "British Pound":
+                    rate = ExchangeRates.British[toCurrencyType];
                     break;
             }
 
             double result = rate * fromCurrencyAmount;
 
-
-            Utils.P($"{fromCurrencyAmount} {fromCurrencyType} = {result} {toCurrencyType}");
+            // output conversion to consle
+            Utils.P($"{fromCurrencyAmount} {fromCurrencyType} = {result.ToString("F")} {toCurrencyType}");
 
             string[] restartMenuOptions =
             {
@@ -257,7 +289,7 @@ namespace PA2
             Utils.P("\n");
             Menu restartMenu = new Menu(restartMenuOptions);
 
-            switch(restartMenu.GetInput())
+            switch (restartMenu.GetInput())
             {
                 case 1:
                     GetValue();
@@ -283,6 +315,9 @@ namespace PA2
             "Calculate Bill",
             "Back",
         };
+
+        const double TAX_RATE = 1.09;
+        const double GRATUITY_PERCENTAGE = 0.18;
 
         double foodTotal = 0;
         double alcoholTotal = 0;
@@ -374,9 +409,14 @@ namespace PA2
 
         void ComputeTotal()
         {
-            gratuityTotal = Math.Round(foodTotal * 0.18);
-            totalDue = Math.Round(gratuityTotal + foodTotal + alcoholTotal, 2);
-            totalDue = Math.Round(totalDue * 1.09, 2);
+            // there is no need to round these numbers because they are rounded with ToString during output
+
+            // calculate gratuity on food only using the specified percentage. 
+            gratuityTotal = foodTotal * GRATUITY_PERCENTAGE;
+
+            // add specified tax rate to food and alcohol. don't tax gratuity
+            totalDue = (foodTotal + alcoholTotal) * TAX_RATE;
+            totalDue += gratuityTotal;
         }
 
         void Finish()
