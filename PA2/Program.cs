@@ -22,7 +22,8 @@ namespace PA2
             P(outputStr);
         }
 
-        public static void Header(string title, string subHeader=null)
+           
+        public static void BuildScreen(string title, string subHeader=null)
         {
             Console.Clear();
             Divider('-', 50);
@@ -191,7 +192,7 @@ namespace PA2
 
         void Intialize()
         {
-            Utils.Header("Convert currencies");
+            Utils.BuildScreen("Convert currencies");
             Utils.P("\n");
 
             if (fromCurrencyType != null && toCurrencyType != null)
@@ -337,11 +338,12 @@ namespace PA2
         double foodTotal = 0;
         double alcoholTotal = 0;
         double gratuityTotal = 0;
+        double amountPaid = 0;
         double totalDue = 0;
 
         public void Render()
         {
-            Utils.Header("Resturant POS");
+            Utils.BuildScreen("Resturant POS");
             menu = new Menu(menuOptions);
             switch (menu.GetInput())
             {
@@ -360,6 +362,7 @@ namespace PA2
             foodTotal = 0;
             alcoholTotal = 0;
             gratuityTotal = 0;
+            amountPaid = 0;
             totalDue = 0;
 
             GetFood();
@@ -369,7 +372,7 @@ namespace PA2
 
         void Initialize()
         {
-            Utils.Header("resturant pos", "Calculate Bill");
+            Utils.BuildScreen("resturant pos", "Calculate Bill");
 
             // output the calculations. round with to string
             Utils.P();
@@ -423,6 +426,25 @@ namespace PA2
             }
         }
 
+        void GetAmountPaid(bool error = false)
+        {
+            Initialize();
+
+            if(error)
+            {
+                Console.WriteLine("Enter the amount paid: $");
+            }
+
+            if(double.TryParse(Console.ReadLine(), out amountPaid))
+            {
+                ComputeTotal();
+            }
+            else
+            {
+                GetAmountPaid(true);
+            }
+        }
+
         void ComputeTotal()
         {
             // there is no need to round these numbers because they are rounded with ToString during output
@@ -472,7 +494,7 @@ namespace PA2
 
         public static void Render()
         {
-            Utils.Header("Hospitality Management Software");
+            Utils.BuildScreen("Hospitality Management Software");
 
             menu = new Menu(menuItems);
 
