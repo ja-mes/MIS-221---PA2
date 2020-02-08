@@ -355,6 +355,20 @@ namespace PA2
                     break;
             }
         }
+        void Initialize()
+        {
+            Utils.BuildScreen("resturant pos", "Calculate Bill");
+
+            // output the calculations. round with to string
+            Console.WriteLine("");
+            Console.WriteLine($"Food:\t\t${foodTotal.ToString("F")}");
+            Console.WriteLine($"Alcohol:\t${alcoholTotal.ToString("F")}");
+            Console.WriteLine($"Gratuity:\t${gratuityTotal.ToString("F")}");
+            Console.WriteLine($"Amount Paid:\t${amountPaid.ToString("F")}");
+            Console.WriteLine($"Total Due:\t${totalDue.ToString("F")}");
+            Console.WriteLine("\n\n");
+
+        }
 
         void CalculateBill()
         {
@@ -367,21 +381,8 @@ namespace PA2
 
             GetFood();
             GetAlcohol();
+            GetAmountPaid();
             Finish();
-        }
-
-        void Initialize()
-        {
-            Utils.BuildScreen("resturant pos", "Calculate Bill");
-
-            // output the calculations. round with to string
-            Utils.P();
-            Utils.P($"Food:\t\t${foodTotal.ToString("F")}");
-            Utils.P($"Alcohol:\t${alcoholTotal.ToString("F")}");
-            Utils.P($"Gratuity:\t${gratuityTotal.ToString("F")}");
-            Utils.P($"Total Due:\t${totalDue.ToString("F")}");
-            Utils.P("\n\n");
-
         }
 
         void GetFood(bool error = false)
@@ -432,8 +433,10 @@ namespace PA2
 
             if(error)
             {
-                Console.WriteLine("Enter the amount paid: $");
+                Console.WriteLine("Invalid entry");
             }
+
+            Console.Write("Enter amount paid: $");
 
             if(double.TryParse(Console.ReadLine(), out amountPaid))
             {
@@ -455,6 +458,8 @@ namespace PA2
             // add specified tax rate to food and alcohol. don't tax gratuity
             totalDue = (foodTotal + alcoholTotal) * TAX_RATE;
             totalDue += gratuityTotal;
+
+            totalDue -= amountPaid;
         }
 
         void Finish()
