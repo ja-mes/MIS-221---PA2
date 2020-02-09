@@ -427,25 +427,27 @@ namespace PA2
             }
         }
 
-        void GetAmountPaid(bool error = false)
+        void GetAmountPaid(bool invalid, bool check)
         {
             Initialize();
 
-            if(error)
-            {
-                Console.WriteLine("Invalid entry");
-            }
-
             Console.Write("Enter amount paid: $");
 
-            if(double.TryParse(Console.ReadLine(), out amountPaid))
+            if (double.TryParse(Console.ReadLine(), out amountPaid))
             {
+                if (amountPaid < totalDue)
+                {
+                    Console.WriteLine($"Payment was for {amountPaid.ToString("F")} but {totalDue.ToString("F")} is due!");
+                    GetAmountPaid();
+                }
                 ComputeTotal();
             }
             else
             {
-                GetAmountPaid(true);
+                Console.WriteLine("Invalid entry");
+                GetAmountPaid();
             }
+
         }
 
         void ComputeTotal()
