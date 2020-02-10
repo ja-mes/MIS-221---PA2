@@ -14,6 +14,10 @@ namespace PA2
      */
     static class Utils
     {
+
+        /*
+         * Divider creates a line accross the screen with the specified char
+         */
         public static void Divider(char c, int length)
         {
             string outputStr = "";
@@ -24,7 +28,7 @@ namespace PA2
         }
 
         /*
-         * The BuildScreen method first clears the terminal, and then builds a header
+         * The BuildScreen method first clears the terminal, and then builds a header with a optional subheader
          */
         public static void BuildScreen(string title, string subHeader = null)
         {
@@ -66,6 +70,11 @@ namespace PA2
             menuItems = items;
         }
 
+        /* 
+         * GetInput writes the menu to the screen, handles error checking and returns the option the user selects. 
+         * This method will call itself recursively until the user selections an option on the menu.
+         * TODO: break this method up into sub-methods. It is doing to much at once.
+         */
         public int GetInput()
         {
             Console.WriteLine();
