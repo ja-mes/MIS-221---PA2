@@ -1,50 +1,61 @@
-﻿using System;
+﻿/*
+ * PA2
+ * MIS 221-320
+ * James Brown
+ */
+
+using System;
 using System.Collections.Generic;
 
 namespace PA2
 {
+    /*
+     * The Utils class provides basic utility methods that are used throughout the program 
+     */
     static class Utils
     {
-        public static void P(string s = "", bool newLine = true)
-        {
-            if (newLine)
-                Console.WriteLine(s);
-            else
-                Console.Write(s);
-        }
-
         public static void Divider(char c, int length)
         {
             string outputStr = "";
             for (int i = 0; i < length; i++)
                 outputStr += c;
 
-            P(outputStr);
+            Console.WriteLine(outputStr);
         }
 
-
+        /*
+         * The BuildScreen method first clears the terminal, and then builds a header
+         */
         public static void BuildScreen(string title, string subHeader = null)
         {
             Console.Clear();
             Divider('-', 50);
-            P($"\n{title.ToUpper()}", false);
+            Console.Write($"\n{title.ToUpper()}");
 
             if (subHeader != null)
-                P($" / {subHeader}");
+                Console.WriteLine($" / {subHeader}");
             else
-                P();
+                Console.WriteLine();
 
-            P();
+            Console.WriteLine();
             Divider('-', 50);
         }
+
+        /*
+         * The Exit method prints to the screen and terminates the program
+         */
         public static void Exit()
         {
-            P("\n\nThank you for using Hospitality Management Software!\n");
+            Console.WriteLine("\n\nThank you for using Hospitality Management Software!\n");
             System.Environment.Exit(0);
         }
 
     }
 
+    /* 
+     * The Menu class will handle every menu in the program. Error checking is built in. The menu will loop until
+     * the user selects a valid menu item.
+     */
     class Menu
     {
         private bool error;
@@ -57,23 +68,23 @@ namespace PA2
 
         public int GetInput()
         {
-            Utils.P(); // make sure the menu has a blank line about it
+            Console.WriteLine();
 
             for (int i = 0; i < menuItems.Length; i++)
             {
                 string output;
                 output = $"({Convert.ToString(i + 1)}) {menuItems[i]}";
 
-                Utils.P(output);
+                Console.WriteLine(output);
             }
             Utils.Divider('_', 50);
 
             if (error)
             {
-                Utils.P($"Invalid Input. Select a value between {1} and {menuItems.Length}");
+                Console.WriteLine($"Invalid Input. Select a value between {1} and {menuItems.Length}");
             }
 
-            Utils.P("Please select an option: ", false);
+            Console.Write("Please select an option: ");
             int selection;
             bool valid = int.TryParse(Console.ReadLine(), out selection);
 
@@ -89,7 +100,7 @@ namespace PA2
     }
 
     /*
-     * Exchange rates uses a collection of dictionaries to store the exchange rates of the supported currencies
+     * ExchangeRates uses a collection of dictionaries to store the exchange rates of the supported currencies
      */
     static class ExchangeRates
     {
@@ -192,13 +203,13 @@ namespace PA2
         void Intialize()
         {
             Utils.BuildScreen("Convert currencies");
-            Utils.P("\n");
+            Console.WriteLine();
 
             if (fromCurrencyType != null && toCurrencyType != null)
             {
-                Utils.P($"From {fromCurrencyType} to {toCurrencyType}");
+                Console.WriteLine($"From {fromCurrencyType} to {toCurrencyType}");
 
-                Utils.P("\n");
+                Console.WriteLine();
             }
         }
         public void Render()
@@ -214,7 +225,7 @@ namespace PA2
             int selection;
 
             // get from currency
-            Utils.P("Convert from:");
+            Console.WriteLine("Convert from:");
             selection = fromMenu.GetInput();
             fromCurrencyType = currencyOptions[selection - 1];
             Intialize(); // Rerender screen  
@@ -229,7 +240,7 @@ namespace PA2
 
             Menu toMenu = new Menu(toCurrencyOptions);
 
-            Utils.P($"Convert from {fromCurrencyType} to:");
+            Console.WriteLine($"Convert from {fromCurrencyType} to:");
             selection = toMenu.GetInput();
             toCurrencyType = toCurrencyOptions[selection - 1];
 
@@ -246,7 +257,7 @@ namespace PA2
                 Console.WriteLine("Invalid entry.");
             }
 
-            Utils.P($"Enter amount in {fromCurrencyType}: ", false);
+            Console.Write($"Enter amount in {fromCurrencyType}: ");
 
             if (double.TryParse(Console.ReadLine(), out fromCurrencyAmount))
             {
@@ -291,7 +302,7 @@ namespace PA2
             double result = rate * fromCurrencyAmount;
 
             // output conversion to console
-            Utils.P($"{fromCurrencyAmount} {fromCurrencyType} = {result.ToString("F")} {toCurrencyType}");
+            Console.WriteLine($"{fromCurrencyAmount} {fromCurrencyType} = {result.ToString("F")} {toCurrencyType}");
 
             string[] restartMenuOptions =
             {
@@ -300,7 +311,7 @@ namespace PA2
                 "Back",
             };
 
-            Utils.P("\n");
+            Console.WriteLine();
             Menu restartMenu = new Menu(restartMenuOptions);
 
             switch (restartMenu.GetInput())
@@ -350,6 +361,10 @@ namespace PA2
                     break;
             }
         }
+
+        /*
+         * The Initialize method builds caculate bill screen and re-displays all variables to the user
+         */
         void Initialize()
         {
             Utils.BuildScreen("resturant pos", "Calculate Bill");
@@ -390,10 +405,10 @@ namespace PA2
 
             if (error)
             {
-                Utils.P("Invalid entry");
+                Console.WriteLine("Invalid entry");
             }
 
-            Utils.P("Enter the food total: $", false);
+            Console.Write("Enter the food total: $");
 
             if (double.TryParse(Console.ReadLine(), out foodTotal))
             {
@@ -411,10 +426,10 @@ namespace PA2
 
             if (error)
             {
-                Utils.P("Invalid entry");
+                Console.WriteLine("Invalid entry");
             }
 
-            Utils.P("Enter the alchohol total: $", false);
+            Console.Write("Enter the alchohol total: $");
 
             if (double.TryParse(Console.ReadLine(), out alcoholTotal))
             {
@@ -462,13 +477,11 @@ namespace PA2
 
         void ComputeTotal(double pmtAmount = 0)
         {
-            // there is no need to round these numbers because they are rounded with ToString during output
-
-            // calculate gratuity on food only using the specified percentage. 
+            // calculate gratuity. gratuity is on food only. it is not taxed
             gratuityTotal = foodTotal * GRATUITY_PERCENTAGE;
-
             // add specified tax rate to food and alcohol. don't tax gratuity
             billTotal = (foodTotal + alcoholTotal) * TAX_RATE;
+            //gratuity will be in the total bill
             billTotal += gratuityTotal;
 
             totalDue = Math.Round(billTotal, 2); // currency for payments will be in 2 decimal places. not rounding will throw off calculations
@@ -476,6 +489,7 @@ namespace PA2
             amountPaid += pmtAmount;
             totalDue -= amountPaid;
 
+            // if the user pays more than their total bill, they will have change due back to them 
             if (amountPaid > billTotal)
             {
                 changeDue = amountPaid - billTotal;
