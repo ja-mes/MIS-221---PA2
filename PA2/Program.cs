@@ -362,7 +362,6 @@ namespace PA2
             Console.WriteLine($"Bill Total: \t${billTotal.ToString("F")}");
             Console.WriteLine("\n");
             Console.WriteLine($"Amount Paid:\t${amountPaid.ToString("F")}");
-            Console.WriteLine($"Amount Due:\t${totalDue.ToString("F")}");
             Console.WriteLine($"Change Due:\t${changeDue.ToString("F")}");
             Console.WriteLine("\n\n");
 
@@ -445,13 +444,14 @@ namespace PA2
             double pmtAmount;
             if (double.TryParse(Console.ReadLine(), out pmtAmount))
             {
-
-                if (pmtAmount < totalDue) { 
-                    ComputeTotal(pmtAmount);
-                    GetAmountPaid(false, true);
-                }
+                pmtAmount = Math.Round(pmtAmount, 2);
 
                 ComputeTotal(pmtAmount);
+
+                if(totalDue > 0)
+                {
+                    GetAmountPaid(false, true);
+                }
             }
             else
             {
@@ -471,14 +471,14 @@ namespace PA2
             billTotal = (foodTotal + alcoholTotal) * TAX_RATE;
             billTotal += gratuityTotal;
 
-            totalDue = billTotal;
+            totalDue = Math.Round(billTotal, 2); // currency for payments will be in 2 decimal places. not rounding will throw off calculations
 
             amountPaid += pmtAmount;
             totalDue -= amountPaid;
 
-            if(amountPaid > totalDue)
+            if (amountPaid > billTotal)
             {
-                changeDue = amountPaid - totalDue;
+                changeDue = amountPaid - billTotal;
             }
             else
             {
