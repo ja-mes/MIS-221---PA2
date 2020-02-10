@@ -22,8 +22,8 @@ namespace PA2
             P(outputStr);
         }
 
-           
-        public static void BuildScreen(string title, string subHeader=null)
+
+        public static void BuildScreen(string title, string subHeader = null)
         {
             Console.Clear();
             Divider('-', 50);
@@ -150,7 +150,7 @@ namespace PA2
 
         public static Dictionary<string, double> Mexican = new Dictionary<string, double>()
         {
-            { "US Dollar", 0.053169	},
+            { "US Dollar", 0.053169 },
             { "Canadian Dollar", 0.070683},
             { "Euro", 0.048059},
             { "Indian Rupee", 3.791722},
@@ -164,14 +164,13 @@ namespace PA2
             { "US Dollar", 1.299683 },
             { "Canadian Dollar", 1.727779},
             { "Euro", 1.174894},
-            { "Indian Rupee", 92.677850	},
+            { "Indian Rupee", 92.677850 },
             { "Japense Yen", 141.260915},
             { "Mexican Peso", 24.438507},
             { "British Pound", 1},
         };
     }
 
-    // TODO: remove selected currency from the to menu
     class ConvertCurriences
     {
         readonly string[] currencyOptions =
@@ -229,7 +228,7 @@ namespace PA2
             string[] toCurrencyOptions = list.ToArray();
 
             Menu toMenu = new Menu(toCurrencyOptions);
-            
+
             Utils.P($"Convert from {fromCurrencyType} to:");
             selection = toMenu.GetInput();
             toCurrencyType = toCurrencyOptions[selection - 1];
@@ -335,11 +334,7 @@ namespace PA2
         const double TAX_RATE = 1.09;
         const double GRATUITY_PERCENTAGE = 0.18;
 
-        double foodTotal = 0;
-        double alcoholTotal = 0;
-        double gratuityTotal = 0;
-        double amountPaid = 0;
-        double totalDue = 0;
+        double foodTotal, alcoholTotal, gratuityTotal, billTotal, amountPaid, changeDue, totalDue;
 
         public void Render()
         {
@@ -364,8 +359,11 @@ namespace PA2
             Console.WriteLine($"Food:\t\t${foodTotal.ToString("F")}");
             Console.WriteLine($"Alcohol:\t${alcoholTotal.ToString("F")}");
             Console.WriteLine($"Gratuity:\t${gratuityTotal.ToString("F")}");
+            Console.WriteLine($"Bill Total: \t${billTotal.ToString("F")}");
+            Console.WriteLine("\n");
             Console.WriteLine($"Amount Paid:\t${amountPaid.ToString("F")}");
-            Console.WriteLine($"Total Due:\t${totalDue.ToString("F")}");
+            Console.WriteLine($"Amount Due:\t${totalDue.ToString("F")}");
+            Console.WriteLine($"Change Due:\t${changeDue.ToString("F")}");
             Console.WriteLine("\n\n");
 
         }
@@ -375,7 +373,9 @@ namespace PA2
             // make sure everything is zero before we start running calculations
             foodTotal = 0;
             alcoholTotal = 0;
+            changeDue = 0;
             gratuityTotal = 0;
+            billTotal = 0;
             amountPaid = 0;
             totalDue = 0;
 
@@ -427,30 +427,40 @@ namespace PA2
             }
         }
 
-        void GetAmountPaid(bool invalid, bool check)
+        void GetAmountPaid(bool error = false, bool notEnough = false)
         {
             Initialize();
 
+            if (error)
+            {
+                Console.WriteLine("Invalid Entry");
+            }
+            else if(notEnough)
+            {
+                Console.WriteLine($"${amountPaid.ToString("F")} has been paid but ${totalDue.ToString("F")} is still due!");
+            }
+
             Console.Write("Enter amount paid: $");
 
-            if (double.TryParse(Console.ReadLine(), out amountPaid))
+            double pmtAmount;
+            if (double.TryParse(Console.ReadLine(), out pmtAmount))
             {
-                if (amountPaid < totalDue)
-                {
-                    Console.WriteLine($"Payment was for {amountPaid.ToString("F")} but {totalDue.ToString("F")} is due!");
-                    GetAmountPaid();
+
+                if (pmtAmount < totalDue) { 
+                    ComputeTotal(pmtAmount);
+                    GetAmountPaid(false, true);
                 }
-                ComputeTotal();
+
+                ComputeTotal(pmtAmount);
             }
             else
             {
-                Console.WriteLine("Invalid entry");
-                GetAmountPaid();
+                GetAmountPaid(true);
             }
 
         }
 
-        void ComputeTotal()
+        void ComputeTotal(double pmtAmount = 0)
         {
             // there is no need to round these numbers because they are rounded with ToString during output
 
@@ -458,10 +468,22 @@ namespace PA2
             gratuityTotal = foodTotal * GRATUITY_PERCENTAGE;
 
             // add specified tax rate to food and alcohol. don't tax gratuity
-            totalDue = (foodTotal + alcoholTotal) * TAX_RATE;
-            totalDue += gratuityTotal;
+            billTotal = (foodTotal + alcoholTotal) * TAX_RATE;
+            billTotal += gratuityTotal;
 
+            totalDue = billTotal;
+
+            amountPaid += pmtAmount;
             totalDue -= amountPaid;
+
+            if(amountPaid > totalDue)
+            {
+                changeDue = amountPaid - totalDue;
+            }
+            else
+            {
+                changeDue = 0;
+            }
         }
 
         void Finish()
